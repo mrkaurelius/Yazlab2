@@ -5,15 +5,29 @@
  */
 package yazlab2;
 
+import java.util.Random;
+
 /**
  *
  * @author mrk1
  */
 public class Data {
-    private int request;
-
+     /*
+    private static int request;
+    private int randomessMultiplier;
+    
     public Data() {
         
     }
     
+    public void setRandomessMultiplier(int randomessMultiplier){
+        this.randomessMultiplier = randomessMultiplier ;
+    }
+    
+    
+    public static int getRandRequest(){
+        Random r = new Random();
+        return request  = r.nextInt(15) * this.randomessMultiplier;
+    }
+    */
 }

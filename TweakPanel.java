@@ -21,10 +21,8 @@ class TweakPanel extends JPanel {
     private JSlider slider;
     private JLabel tweakInfo;
     private JLabel randInfo;
-    private int randInt;
-
-    // sliderin davranısını test et
-    // sunucuların performanslarını tweak edecek widgetleri ekle 
+    // class elemanlarının isimlerini daha anlasılır yap
+    
     public TweakPanel() {
         Border tweakBorder = BorderFactory.createTitledBorder("tweak");
         int numRow = 0; //many rows as needed
@@ -44,9 +42,17 @@ class TweakPanel extends JPanel {
         this.add(randInfo);
         this.setBorder(tweakBorder);
     }
+    
+    public void setRandInfo(int randInfo){
+        this.randInfo.setText("Rast Deger: " + String.valueOf(randInfo));
+    }
 
     public void setTweakInfo(String ti) {
         tweakInfo.setText(ti);
+    }
+    
+    public int getTweakSliderValue(){
+        return this.slider.getValue();
     }
 
     public JSlider getSlider() {

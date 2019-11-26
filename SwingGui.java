@@ -20,14 +20,15 @@ import javax.swing.event.ChangeListener;
  *
  * @author mrk1
  */
-public class SwingGui extends JFrame {
+public class SwingGui extends JFrame implements Runnable {
 
     private JPanel mainPanel;
-    private ThreadWatcherPanel mainThreadWatcherPanel;
-    private ThreadWatcherPanel subThreadWatcherPanel_1;
-    private ThreadWatcherPanel subThreadWatcherPanel_2;
-    JPanel ThreadWatcherContainer;
-    private ArrayList<ThreadWatcherPanel> dynamicSubThreads = new ArrayList<>();
+    private ThreadMonitorPanel mainThreadMonitorPanel;
+    public static JPanel ThreadMonitorContainer;
+
+    //public static ArrayList<ThreadMonitorPanel> dynamicSubThreads = new ArrayList<>();
+    // belki dynamicSubThreadlerle gerek kalmaz
+    private TweakPanel tweakPanel;
 
     public SwingGui() {
         initGui();
@@ -41,63 +42,61 @@ public class SwingGui extends JFrame {
         Dimension dim = tk.getScreenSize();
         int xPos = (dim.width / 2) - (this.getWidth() / 2);
         int yPos = (dim.height / 2) - (this.getHeight() / 2);
-        //this.setLayout(new BorderLayout());
         this.setLocation(xPos, yPos);
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // sliderin configini ayarla
         LisenForChange cl = new LisenForChange();
-        TweakPanel tp = new TweakPanel();
-        tp.getSlider().addChangeListener(cl);
+        tweakPanel = new TweakPanel();
+        tweakPanel.getSlider().addChangeListener(cl);
 
-        ThreadWatcherContainer = new JPanel();
-        ThreadWatcherContainer.setLayout(new GridLayout(0, 3, 10, 10));
+        ThreadMonitorContainer = new JPanel();
+        ThreadMonitorContainer.setLayout(new GridLayout(0, 3, 10, 10));
 
         mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
 
-        mainThreadWatcherPanel = new ThreadWatcherPanel("Ana thread", 1000, 0);
-        subThreadWatcherPanel_1 = new ThreadWatcherPanel("Alt thread1", 500, 0);
-        subThreadWatcherPanel_2 = new ThreadWatcherPanel("Alt thread2", 500, 0);
+        mainThreadMonitorPanel = new ThreadMonitorPanel("Ana thread", 10000, 0, 0);
 
-        ThreadWatcherContainer.add(mainThreadWatcherPanel);
-        ThreadWatcherContainer.add(subThreadWatcherPanel_1);
-        ThreadWatcherContainer.add(subThreadWatcherPanel_2);
+        ThreadMonitorContainer.add(mainThreadMonitorPanel);
 
-        mainPanel.add(tp, BorderLayout.NORTH);
-        mainPanel.add(ThreadWatcherContainer, BorderLayout.CENTER);
+        //mainPanel.add(tweakPanel, BorderLayout.NORTH);
+        mainPanel.add(ThreadMonitorContainer, BorderLayout.CENTER);
         this.add(mainPanel);
         this.setVisible(true);
     }
 
-    public void addThreadWatcherPanel(String labelString) {
-        ThreadWatcherPanel tw = new ThreadWatcherPanel(labelString, 500, 0);
-        ThreadWatcherContainer.add(tw);
-        dynamicSubThreads.add(tw);
-        revalidate();
+    public static ThreadMonitorPanel addThreadMonitorPanel(String labelString, int id) {
+        // sloppy method
+        ThreadMonitorPanel tw = new ThreadMonitorPanel(labelString, 5000, 0, id);
+        ThreadMonitorContainer.add(tw);
+        //dynamicSubThreads.add(tw);
+        return tw;
+        //revalidate();
+
     }
 
-    public void removeThreadWatcherPanel(ThreadWatcherPanel tw) {
-        dynamicSubThreads.remove(tw);
-        ThreadWatcherContainer.remove(tw);
-        revalidate();
+    public static void removeThreadMonitorPanel(ThreadMonitorPanel tw) {
+        // sloppy method
+        //dynamicSubThreads.remove(tw);
+        ThreadMonitorContainer.remove(tw);
+        //revalidate();
     }
 
-    public ArrayList<ThreadWatcherPanel> getDynamicSubThreads() {
+    /*
+    public ArrayList<ThreadMonitorPanel> getDynamicSubThreads() {
         return dynamicSubThreads;
     }
-
-    public ThreadWatcherPanel getMainThreadWatcherPanel() {
-        return mainThreadWatcherPanel;
+    */
+    
+    public ThreadMonitorPanel getMainThreadMonitorPanel() {
+        return mainThreadMonitorPanel;
     }
 
-    public ThreadWatcherPanel getSubThreadWatcherPanel1() {
-        return subThreadWatcherPanel_1;
-    }
-
-    public ThreadWatcherPanel getSubThreadWatcherPanel2() {
-        return subThreadWatcherPanel_2;
+    @Override
+    public void run() {
+        // burada neler olarbilir
+        // javanın bu thread hakkında neyi bilmesi
     }
 
     private class LisenForChange implements ChangeListener {
@@ -106,12 +105,23 @@ public class SwingGui extends JFrame {
         public void stateChanged(ChangeEvent ce) {
             //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             JSlider sl = (JSlider) ce.getSource();
-            TweakPanel tw = (TweakPanel) sl.getParent();
-            tw.setTweakInfo("Rast. Çarpanı: " + sl.getValue());
-            System.out.println(sl.getValue());
-            //tweakInfo.setText("Rast. Çarpanı: " + slider.getValue());
+            tweakPanel = (TweakPanel) sl.getParent();
+            tweakPanel.setTweakInfo("Rast. Çarpanı: " + sl.getValue());
+            System.out.println("slider state changed " + sl.getValue());
 
         }
+    }
+
+    public TweakPanel getTweakPanel() {
+        return tweakPanel;
+    }
+
+    public void setTweakInfoGui(String ti) {
+        tweakPanel.setTweakInfo(ti);
+    }
+
+    public int getTweakSliderValueGui() {
+        return tweakPanel.getTweakSliderValue();
     }
 
 }
