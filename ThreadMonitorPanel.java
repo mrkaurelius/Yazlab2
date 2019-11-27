@@ -17,42 +17,40 @@ import javax.swing.JProgressBar;
 public class ThreadMonitorPanel extends JPanel {
 
     private JLabel threadNameLabel;
-    private JLabel MonitorInfoLabel;
+    private JLabel MonitorRequestLabel;
+    private JLabel MonitorRespondLabel;
+
     private JProgressBar tmProgressBar;
-    
+
     private int capacity;
     private int tmID;
-    
-    // threadin istek alma ve istek işleme sayısını, gecirdigi zamanı sakla
-    // respondları ta labellerde goster
-    
-    public ThreadMonitorPanel(String labelString, int capacity, int load,int tmID) {
+
+    public ThreadMonitorPanel(String labelString, int capacity, int load, int tmID) {
         threadNameLabel = new JLabel();
         tmProgressBar = new JProgressBar();
-        MonitorInfoLabel = new JLabel();
-       
+        MonitorRequestLabel = new JLabel();
+        MonitorRespondLabel = new JLabel();
+
         threadNameLabel.setText(labelString);
-        MonitorInfoLabel.setText("0/" + String.valueOf(capacity) + ", " + "Gelen: "
+        MonitorRequestLabel.setText("0/" + String.valueOf(capacity) + ", " + "Gelen: "
+                + 0);
+        MonitorRespondLabel.setText("0/" + String.valueOf(capacity) + ", " + "Gelen: "
                 + 0);
 
-        
-        //tmID = nextID.incrementAndGet();
         this.capacity = capacity;
         this.tmID = tmID;
         tmProgressBar.setMinimum(0);
         tmProgressBar.setMaximum(capacity);
 
-        
         this.add(threadNameLabel);
         this.add(tmProgressBar);
-        this.add(MonitorInfoLabel);
-        //System.out.println(labelString + " grafik monitörü  olustruldu " + "tmID: ");
+        this.add(MonitorRequestLabel);
     }
 
-    public void setLoad(int load,int incomingRequests) {
+    public void setLoad(int load, int newResquests, int newResponds) {
         this.tmProgressBar.setValue(load);
-        MonitorInfoLabel.setText(load + "/" + String.valueOf(capacity) + ", " + "Gelen: "
-                + incomingRequests);
+        MonitorRequestLabel.setText(load + "/" + String.valueOf(capacity) + ", " + "Gelen: "
+                + newResquests + " Cevap: " + newResponds);
     }
 
 }

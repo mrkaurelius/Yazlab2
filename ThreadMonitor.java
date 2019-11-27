@@ -14,12 +14,12 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author mrk1
  */
-//TODO
-// thread monitor Manupulates gui ?
-// Collections.synchronizedList() olsun threadler buraya kapasiterlerini yazsın
-// arraylist de olabilir sonucta ayrı elemanlara yazacaklar 
 public class ThreadMonitor extends Thread {
-
+    //TODO
+    // Collections.synchronizedList() olsun threadler buraya kapasiterlerini yazsın
+    // arraylist de olabilir sonucta ayrı elemanlara yazacaklar 
+    // thread monitor buradaki verilere nasıl erisecek
+    
     public static ArrayList<ThreadMetric> ThreadMetricList;
 
     public ThreadMonitor() {
@@ -60,7 +60,8 @@ public class ThreadMonitor extends Thread {
     public void run() {
         while (true) {
             for (int i = 0; i < ThreadMetricList.size(); i++) {
-                System.out.println("Thread ID: " + ThreadMetricList.get(i).getID() + ", ThreadLoadPercent: " + ThreadMetricList.get(i).getLoadPercent());
+                System.out.println("Thread ID: " + ThreadMetricList.get(i).getID()
+                        + ", ThreadLoad%: " + ThreadMetricList.get(i).getLoadPercent());
             }
             wait(1000);
         }

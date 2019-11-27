@@ -16,26 +16,16 @@ public class MainServerThread extends Thread {
 
     // TODO 
     public static int requests;
-    private int newRequests;
     private int capacity;
-
-
-    private ThreadMonitorPanel tm; // cok akıllıca degil ama is gorecek gibi
+    private ThreadMonitorPanel tm;
+    ReentrantLock lock = new ReentrantLock();
 
     public MainServerThread(ThreadMonitorPanel tm) {
+        // monitor panel eklemeyi sub threadde farklı implement ettim 
         this.tm = tm;
         capacity = 10000;
         ThreadMonitor.addtoThreadMetricList(1);
     }
-
-    public int getRequestCount() {
-        return MainServerThread.requests;
-    }
-
-    public int getNewRequestCount() {
-        return this.newRequests;
-    }
-
 
     private synchronized int getRandRequest() {
         Random r = new Random();
@@ -51,24 +41,36 @@ public class MainServerThread extends Thread {
     public void run() {
         while (true) {
             // neden cevap istegi hic gecemiyor
-            newRequests = getRandRequest();
+            // request manipulasyonuna daha estetik bir cozum bulunabilir 
+            // thread veri iletisimini nerede lock etmeliyim yada lock etmeli miyim ?
+            int newRequests = getRandRequest();
+            lock.lock();
             requests += newRequests;
-            if(requests >= 10000){
+            if (requests > 10000) {
                 requests = 10000;
             }
             ThreadMonitor.setLoad(1, requests, this.capacity);
-            wait(500);
-            requests -= getRandRespond();
-            ThreadMonitor.setLoad(1, requests, this.capacity);
-            updateGui();
+            lock.unlock();
 
-            //
+            wait(200);
+            int newResponds = getRandRespond();
+            lock.lock();
+
+            requests -= newResponds;
+            if (requests < 0) {
+                requests = 0;
+            }
+            ThreadMonitor.setLoad(1, requests, this.capacity);
+            lock.unlock();
+
+            updateGui(newRequests, newResponds);
+            wait(500);
         }
 
     }
 
-    private void updateGui() {
-        tm.setLoad(requests, newRequests);
+    private void updateGui(int newRequests, int newResponds) {
+        tm.setLoad(requests, newRequests, newResponds);
     }
 
     public static void wait(int ms) {

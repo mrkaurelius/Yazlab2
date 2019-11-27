@@ -13,21 +13,14 @@ public class Yazlab2 {
 
     public static void main(String[] args) {
         // TODO code application logic here
-        // threadlere veri girisi kendi looplari uzerinde olmalı
-        // threadleri objeler olarak dusunme
-        // threadin gercekten istedigim sure kadar durdugunu nerden biliyorum
-        // metadayı gostermeti yaptoık implementasyon nasıl iyilestirilebilir
+        // threadleri nasıl somutlastırmali
         // nerelerde bilemedigim senaryolar ortaya cıkabilir 
-        // java thread yapısı 
-        // cevap verme sayisi nasıl implement edilmeli
-        // thread lock derek banas
-        // elemanların hepsi thread olmalı 
-        // simdilik tweak menusunu discard ettim
-        // threadler kendi kapasitelerine gore thread monitordeki bir veriyi
-        // manipule etsin
-        // sub threadlerin kendi kendini imha edebilir
-        // thread monitor ile main serveri nasıl senkronize edebilirims
-        // synchronisedin anlamı ne
+        // !!! java thread yapısı 
+        // !!! kodu nasıl test etmeliyim 
+        // !!! threadler nasıl senkronize edilmeli
+            // suanlık 
+        // !!! thread monitor nasıl implement edilmeli
+        //     sub threadler kendilerini nasıl bir yolla kapatmalı
 
         SwingGui gui = new SwingGui();
         gui.run(); //gui thread loop burada ne yapılabilir ?
@@ -35,15 +28,13 @@ public class Yazlab2 {
         ThreadMonitor threadMonitor = new ThreadMonitor();
 
         MainServerThread mainSever = new MainServerThread(gui.getMainThreadMonitorPanel());
-        SubServerThread subServer_1 = new SubServerThread(1000);
-        SubServerThread subServer_2 = new SubServerThread(2000);
-        SubServerThread subServer_3 = new SubServerThread(2000);
+        SubServerThread subServer_1 = new SubServerThread(0);
+        SubServerThread subServer_2 = new SubServerThread(0);
 
         threadMonitor.start();
         mainSever.start();
         subServer_1.start();
         subServer_2.start();
-        subServer_3.start();
 
     }
 
