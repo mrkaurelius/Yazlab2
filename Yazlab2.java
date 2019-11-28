@@ -18,23 +18,34 @@ public class Yazlab2 {
         // !!! java thread yapısı 
         // !!! kodu nasıl test etmeliyim 
         // !!! threadler nasıl senkronize edilmeli
-            // suanlık 
+        // suanlık 
         // !!! thread monitor nasıl implement edilmeli
         //     sub threadler kendilerini nasıl bir yolla kapatmalı
-
+        // senkronizasyon degil mantıksal kısımları gozden gecir
+        // kilitleri kaldısam ne degisecek
+        
+        
         SwingGui gui = new SwingGui();
         gui.run(); //gui thread loop burada ne yapılabilir ?
 
+        ThreadManager threadManager = new ThreadManager();
         ThreadMonitor threadMonitor = new ThreadMonitor();
 
         MainServerThread mainSever = new MainServerThread(gui.getMainThreadMonitorPanel());
-        SubServerThread subServer_1 = new SubServerThread(0);
-        SubServerThread subServer_2 = new SubServerThread(0);
+        //mainSever.setPriority(10);
+        //SubServerThread subServer_1 = new SubServerThread(0);
+        //SubServerThread subServer_2 = new SubServerThread(0);
+        //SubServerThread subServer_3 = new SubServerThread(0);
 
+        threadManager.start();
         threadMonitor.start();
         mainSever.start();
-        subServer_1.start();
-        subServer_2.start();
+        //subServer_1.start();
+        //subServer_2.start();
+        //subServer_3.start();
+
+        ThreadManager.createAndStartSubServerThread(0);
+        ThreadManager.createAndStartSubServerThread(0);
 
     }
 

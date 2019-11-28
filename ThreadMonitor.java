@@ -6,9 +6,6 @@
 package yazlab2;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
@@ -19,7 +16,7 @@ public class ThreadMonitor extends Thread {
     // Collections.synchronizedList() olsun threadler buraya kapasiterlerini yazsın
     // arraylist de olabilir sonucta ayrı elemanlara yazacaklar 
     // thread monitor buradaki verilere nasıl erisecek
-    
+
     public static ArrayList<ThreadMetric> ThreadMetricList;
 
     public ThreadMonitor() {
@@ -28,16 +25,17 @@ public class ThreadMonitor extends Thread {
     }
 
     public synchronized static void addtoThreadMetricList(int ThreadID) {
-        System.out.println("ThreadID: " + ThreadID);
+        //System.out.println("ThreadID: " + ThreadID);
         ThreadMetric tm = new ThreadMetric(ThreadID);
         ThreadMetricList.add(tm);
-        System.out.println(tm.getID() + " ThreadMonitöre Eklendi");
+        System.out.println(ThreadID + " ThreadMonitöre Eklendi");
 
     }
 
     public static void removeFromThreadMetricList(int threadID) {
         for (int i = 0; i < ThreadMetricList.size(); i++) {
             if (ThreadMetricList.get(i).getID() == threadID) {
+                System.out.println("ID: " + ThreadMetricList.get(i).getID() + " ThreadMonitorden çıkarıldı");
                 ThreadMetricList.remove(i);
                 break;
             }
@@ -49,6 +47,8 @@ public class ThreadMonitor extends Thread {
         //System.out.println(threadID + "," + load + "," + capacity);
         for (ThreadMetric threadMetric : ThreadMetricList) {
             if (threadID == threadMetric.getID()) {
+                // threadler burada eklenebilir mi ?
+                // subserverin istek sayisi alatmak gerekiek buyuk ihtimal olmaz
                 threadMetric.setLoadPercent((int) ((float) (load / (float) capacity) * (float) 100));
                 //System.out.println("set edilen deger" + threadMetric.getLoadPercent());
                 //System.out.println("threadMetric load percent degeri güncellendi");

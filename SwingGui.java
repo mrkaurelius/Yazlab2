@@ -66,7 +66,7 @@ public class SwingGui extends JFrame implements Runnable {
         this.setVisible(true);
     }
 
-    public static ThreadMonitorPanel addThreadMonitorPanel(String labelString, int id) {
+    public static synchronized ThreadMonitorPanel addThreadMonitorPanel(String labelString, int id) {
         // sloppy method
         ThreadMonitorPanel tw = new ThreadMonitorPanel(labelString, 5000, 0, id);
         ThreadMonitorContainer.add(tw);
@@ -76,7 +76,7 @@ public class SwingGui extends JFrame implements Runnable {
 
     }
 
-    public static void removeThreadMonitorPanel(ThreadMonitorPanel tw) {
+    public static synchronized void removeThreadMonitorPanel(ThreadMonitorPanel tw) {
         // sloppy method
         //dynamicSubThreads.remove(tw);
         ThreadMonitorContainer.remove(tw);
@@ -97,6 +97,7 @@ public class SwingGui extends JFrame implements Runnable {
     public void run() {
         // burada neler olarbilir
         // javanın bu thread hakkında neyi bilmesi
+        revalidate();
     }
 
     private class LisenForChange implements ChangeListener {

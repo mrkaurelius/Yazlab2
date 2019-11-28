@@ -19,64 +19,106 @@ public class SubServerThread extends Thread {
     // requestinden cıkar
 
     static AtomicInteger nextID = new AtomicInteger();    // this will guarantee that if two objects are created at exactly same time
-    private int subServerThreadID;
-    private int capacity;
+    private final int subServerThreadID;
+    private final int capacity;
     private ThreadMonitorPanel tm;
-    private int SubServerRequests;
+    private int subServerRequests;
     ReentrantLock lock = new ReentrantLock();
+    public volatile Object dummyLock;
+
+    public volatile boolean alive;
 
     public SubServerThread(int forkRequests) {
+        this.alive = true;
         subServerThreadID = 1 + nextID.incrementAndGet();
         this.capacity = 5000;
-        this.tm = SwingGui.addThreadMonitorPanel("deneme 1", subServerThreadID);
+        this.tm = SwingGui.addThreadMonitorPanel("Thread: " + String.valueOf(subServerThreadID), subServerThreadID);
         ThreadMonitor.addtoThreadMetricList(subServerThreadID);
-        this.SubServerRequests = forkRequests;
-        System.out.println("Subserver ID: " + this.subServerThreadID + " baslatildı");
+        this.subServerRequests = forkRequests;
+        System.out.println("SubServer ID: " + this.subServerThreadID + " baslatildı");
     }
 
     private synchronized int getRandRequest() {
         Random r = new Random();
-        return r.nextInt(490) + 1;
+        return r.nextInt(700) + 1;
     }
 
     private synchronized int getRandRespond() {
         Random r = new Random();
-        return r.nextInt(490) + 1;
+        return r.nextInt(500) + 1;
     }
 
     @Override
     public void run() {
-        while (true) {
+        System.out.println("subServer ThreadID: " + this.subServerThreadID + " Kosmaya basladı");
+        while (this.alive) {
+
             int newResquests = getRandRequest();
-            
+
             lock.lock();
-            MainServerThread.requests -= newResquests;
-            SubServerRequests += newResquests;
-            if (SubServerRequests > 5000) {
-                SubServerRequests = 5000;
+            //MainServerThread.requests = MainServerThread.requests - newResquests;
+            if (newResquests > MainServerThread.requests) {
+                newResquests = MainServerThread.requests;
+                MainServerThread.requests = MainServerThread.requests - newResquests;
+
+            } else {
+                MainServerThread.requests = MainServerThread.requests - newResquests;
             }
-            ThreadMonitor.setLoad(this.subServerThreadID, SubServerRequests, this.capacity);
+
             lock.unlock();
-            
+
+            subServerRequests = subServerRequests + newResquests;
+            if (subServerRequests > 5000) {
+                subServerRequests = 5000;
+            }
+            if (subServerRequests >= 3500) {
+
+                lock.lock();
+                ThreadManager.createAndStartSubServerThread(subServerRequests / 2);
+                lock.unlock();
+
+                subServerRequests = subServerRequests / 2;
+            }
+            ThreadMonitor.setLoad(this.subServerThreadID, subServerRequests, this.capacity);
+
             wait(300);
 
             int newResponds = getRandRespond();
-           
+            subServerRequests = subServerRequests - newResponds;
             lock.lock();
-            SubServerRequests -= newResponds;
-            if (SubServerRequests < 0) {
-                SubServerRequests = 0;
+
+            if (subServerRequests < 0) {
+                // thread managerden thread sayisini al eger thread sayisi 2 den 
+                // azsa sil
+                lock.lock();
+                if (ThreadManager.getSubServerThreadCount() > 2) {
+                    System.out.println("Thread ID: " + subServerThreadID + " silindi");
+                    ThreadMonitor.removeFromThreadMetricList(this.subServerThreadID);
+                    SwingGui.removeThreadMonitorPanel(tm);
+                    return;
+                }
+                subServerRequests = 0;
+                lock.unlock();
+
             }
-            ThreadMonitor.setLoad(this.subServerThreadID, SubServerRequests, this.capacity);
             lock.unlock();
-            
+
+            ThreadMonitor.setLoad(this.subServerThreadID, subServerRequests, this.capacity);
             updateGui(newResquests, newResponds);
+
             wait(500);
         }
     }
 
-    private void updateGui(int newRequests, int newResponds) {
-        tm.setLoad(SubServerRequests, newRequests, newResponds);
+    private synchronized void updateGui(int newRequests, int newResponds) {
+        tm.setLoad(subServerRequests, newRequests, newResponds);
+    }
+
+    public synchronized void killSubServerThread() {
+        this.alive = false;
+        // asagidaki metoların cıktısını verbose yap
+        SwingGui.removeThreadMonitorPanel(tm);
+        ThreadMonitor.removeFromThreadMetricList(this.subServerThreadID);
     }
 
     public static void wait(int ms) {

@@ -16,7 +16,7 @@ public class MainServerThread extends Thread {
 
     // TODO 
     public static int requests;
-    private int capacity;
+    private final int capacity;
     private ThreadMonitorPanel tm;
     ReentrantLock lock = new ReentrantLock();
 
@@ -29,12 +29,12 @@ public class MainServerThread extends Thread {
 
     private synchronized int getRandRequest() {
         Random r = new Random();
-        return r.nextInt(990) + 1;
+        return r.nextInt(2000) + 1;
     }
 
     private synchronized int getRandRespond() {
         Random r = new Random();
-        return r.nextInt(490) + 1;
+        return r.nextInt(500) + 1;
     }
 
     @Override
@@ -43,9 +43,10 @@ public class MainServerThread extends Thread {
             // neden cevap istegi hic gecemiyor
             // request manipulasyonuna daha estetik bir cozum bulunabilir 
             // thread veri iletisimini nerede lock etmeliyim yada lock etmeli miyim ?
+
             int newRequests = getRandRequest();
             lock.lock();
-            requests += newRequests;
+            requests = requests + newRequests;
             if (requests > 10000) {
                 requests = 10000;
             }
@@ -53,23 +54,25 @@ public class MainServerThread extends Thread {
             lock.unlock();
 
             wait(200);
+
             int newResponds = getRandRespond();
             lock.lock();
-
-            requests -= newResponds;
+            requests = requests - newResponds;
             if (requests < 0) {
                 requests = 0;
             }
             ThreadMonitor.setLoad(1, requests, this.capacity);
+            updateGui(newRequests, newResponds);
+
             lock.unlock();
 
-            updateGui(newRequests, newResponds);
             wait(500);
+
         }
 
     }
 
-    private void updateGui(int newRequests, int newResponds) {
+    private synchronized void updateGui(int newRequests, int newResponds) {
         tm.setLoad(requests, newRequests, newResponds);
     }
 
