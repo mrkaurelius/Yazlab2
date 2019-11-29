@@ -51,6 +51,7 @@ public class SubServerThread extends Thread {
     @Override
     public void run() {
         System.out.println("subServer ThreadID: " + this.subServerThreadID + " Kosmaya basladı");
+
         while (this.alive) {
 
             int newResquests = getRandRequest();
@@ -71,6 +72,7 @@ public class SubServerThread extends Thread {
             if (subServerRequests > 5000) {
                 subServerRequests = 5000;
             }
+            updateRequestGui(newResquests);
             if (subServerRequests >= 3500) {
 
                 lock.lock();
@@ -85,12 +87,14 @@ public class SubServerThread extends Thread {
 
             int newResponds = getRandRespond();
             subServerRequests = subServerRequests - newResponds;
+
             lock.lock();
 
             if (subServerRequests < 0) {
                 // thread managerden thread sayisini al eger thread sayisi 2 den 
                 // azsa sil
                 lock.lock();
+
                 if (ThreadManager.getSubServerThreadCount() > 2) {
                     System.out.println("Thread ID: " + subServerThreadID + " silindi");
                     ThreadMonitor.removeFromThreadMetricList(this.subServerThreadID);
@@ -101,10 +105,12 @@ public class SubServerThread extends Thread {
                 lock.unlock();
 
             }
+
             lock.unlock();
+            updateRespondGui(newResponds);
 
             ThreadMonitor.setLoad(this.subServerThreadID, subServerRequests, this.capacity);
-            updateGui(newResquests, newResponds);
+            //updateGui(newResquests, newResponds);
 
             wait(500);
         }
@@ -112,6 +118,14 @@ public class SubServerThread extends Thread {
 
     private synchronized void updateGui(int newRequests, int newResponds) {
         tm.setLoad(subServerRequests, newRequests, newResponds);
+    }
+
+    private void updateRequestGui(int newRequests) {
+        tm.setRequest(subServerRequests, newRequests);
+    }
+
+    private void updateRespondGui(int newResponds) {
+        tm.setRespond(subServerRequests, newResponds);
     }
 
     public synchronized void killSubServerThread() {

@@ -32,10 +32,6 @@ public class ThreadMonitorPanel extends JPanel {
         MonitorRespondLabel = new JLabel();
 
         threadNameLabel.setText(labelString);
-        MonitorRequestLabel.setText("0/" + String.valueOf(capacity) + ", " + "Gelen: "
-                + 0);
-        MonitorRespondLabel.setText("0/" + String.valueOf(capacity) + ", " + "Gelen: "
-                + 0);
 
         this.capacity = capacity;
         this.tmID = tmID;
@@ -45,6 +41,8 @@ public class ThreadMonitorPanel extends JPanel {
         this.add(threadNameLabel);
         this.add(tmProgressBar);
         this.add(MonitorRequestLabel);
+        this.add(MonitorRespondLabel);
+
     }
 
     public void setLoad(int load, int newResquests, int newResponds) {
@@ -53,4 +51,14 @@ public class ThreadMonitorPanel extends JPanel {
                 + newResquests + " Cevap: " + newResponds);
     }
 
+    public void setRequest(int load, int newResquests) {
+        this.tmProgressBar.setValue(load);
+        MonitorRequestLabel.setText(load + "/" + String.valueOf(capacity) + ", " + "Gelen: "
+                + newResquests);
+    }
+
+    public void setRespond(int load, int newResponds) {
+        this.tmProgressBar.setValue(load);
+        MonitorRespondLabel.setText(" Cevap: " + newResponds);
+    }
 }

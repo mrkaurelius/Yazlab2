@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author mrk1
  */
-public class ThreadManager extends Thread {
+public class ThreadManager implements Runnable {
 
     //TODO
     // manager yeni subserverthread olusturmalı ve istekleri yeni olusan sunucuya

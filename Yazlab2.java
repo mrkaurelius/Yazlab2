@@ -21,8 +21,9 @@ public class Yazlab2 {
         // suanlık 
         // !!! thread monitor nasıl implement edilmeli
         //     sub threadler kendilerini nasıl bir yolla kapatmalı
-        // senkronizasyon degil mantıksal kısımları gozden gecir
         // kilitleri kaldısam ne degisecek
+        // update guiyi degistirebilirim 
+        // thread monitor panele 2 tabe label ekleyebilirim
         
         
         SwingGui gui = new SwingGui();
@@ -37,7 +38,7 @@ public class Yazlab2 {
         //SubServerThread subServer_2 = new SubServerThread(0);
         //SubServerThread subServer_3 = new SubServerThread(0);
 
-        threadManager.start();
+        threadManager.run();
         threadMonitor.start();
         mainSever.start();
         //subServer_1.start();

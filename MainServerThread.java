@@ -45,26 +45,32 @@ public class MainServerThread extends Thread {
             // thread veri iletisimini nerede lock etmeliyim yada lock etmeli miyim ?
 
             int newRequests = getRandRequest();
+
             lock.lock();
+
             requests = requests + newRequests;
             if (requests > 10000) {
                 requests = 10000;
             }
-            ThreadMonitor.setLoad(1, requests, this.capacity);
             lock.unlock();
+
+            ThreadMonitor.setLoad(1, requests, this.capacity);
 
             wait(200);
 
             int newResponds = getRandRespond();
+
             lock.lock();
+
             requests = requests - newResponds;
             if (requests < 0) {
                 requests = 0;
             }
-            ThreadMonitor.setLoad(1, requests, this.capacity);
-            updateGui(newRequests, newResponds);
 
             lock.unlock();
+
+            ThreadMonitor.setLoad(1, requests, this.capacity);
+            updateGui(newRequests, newResponds);
 
             wait(500);
 
