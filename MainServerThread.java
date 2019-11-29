@@ -78,6 +78,14 @@ public class MainServerThread extends Thread {
 
     }
 
+    private void updateRequestGui(int newRequests) {
+        tm.setRequest(requests, newRequests);
+    }
+
+    private void updateRespondGui(int newResponds) {
+        tm.setRespond(requests, newResponds);
+    }
+
     private synchronized void updateGui(int newRequests, int newResponds) {
         tm.setLoad(requests, newRequests, newResponds);
     }

@@ -43,12 +43,9 @@ public class ThreadMonitor extends Thread {
     }
 
     public synchronized static void setLoad(int threadID, int load, int capacity) {
-        //System.out.print("set load calisti ");
         //System.out.println(threadID + "," + load + "," + capacity);
         for (ThreadMetric threadMetric : ThreadMetricList) {
             if (threadID == threadMetric.getID()) {
-                // threadler burada eklenebilir mi ?
-                // subserverin istek sayisi alatmak gerekiek buyuk ihtimal olmaz
                 threadMetric.setLoadPercent((int) ((float) (load / (float) capacity) * (float) 100));
                 //System.out.println("set edilen deger" + threadMetric.getLoadPercent());
                 //System.out.println("threadMetric load percent degeri güncellendi");

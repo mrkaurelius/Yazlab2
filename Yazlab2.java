@@ -47,7 +47,7 @@ public class Yazlab2 {
 
         ThreadManager.createAndStartSubServerThread(0);
         ThreadManager.createAndStartSubServerThread(0);
-
+ 
     }
 
     public static void wait(int ms) {

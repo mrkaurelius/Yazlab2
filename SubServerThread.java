@@ -24,7 +24,7 @@ public class SubServerThread extends Thread {
     private ThreadMonitorPanel tm;
     private int subServerRequests;
     ReentrantLock lock = new ReentrantLock();
-    public volatile Object dummyLock;
+    public final Object dummyLock;
 
     public volatile boolean alive;
 
@@ -35,6 +35,7 @@ public class SubServerThread extends Thread {
         this.tm = SwingGui.addThreadMonitorPanel("Thread: " + String.valueOf(subServerThreadID), subServerThreadID);
         ThreadMonitor.addtoThreadMetricList(subServerThreadID);
         this.subServerRequests = forkRequests;
+        dummyLock = new Object();
         System.out.println("SubServer ID: " + this.subServerThreadID + " baslatildı");
     }
 
@@ -86,27 +87,30 @@ public class SubServerThread extends Thread {
             wait(300);
 
             int newResponds = getRandRespond();
-            subServerRequests = subServerRequests - newResponds;
 
             lock.lock();
+            subServerRequests = subServerRequests - newResponds;
+            lock.unlock();
 
-            if (subServerRequests < 0) {
+            if (subServerRequests <= 0) {
                 // thread managerden thread sayisini al eger thread sayisi 2 den 
                 // azsa sil
-                lock.lock();
 
-                if (ThreadManager.getSubServerThreadCount() > 2) {
-                    System.out.println("Thread ID: " + subServerThreadID + " silindi");
-                    ThreadMonitor.removeFromThreadMetricList(this.subServerThreadID);
-                    SwingGui.removeThreadMonitorPanel(tm);
-                    return;
+                synchronized (dummyLock) {
+                    if (ThreadManager.getSubServerThreadCount() > 2) {
+                        System.out.println("Thread ID: " + subServerThreadID + " silindi");
+                        ThreadMonitor.removeFromThreadMetricList(this.subServerThreadID);
+                        ThreadManager.decreaseThreadCount();
+                        updateRespondGui(newResponds);
+                        SwingGui.removeThreadMonitorPanel(tm);
+                        return;
+                    } else {
+                        subServerRequests = 0;
+                    }
                 }
-                subServerRequests = 0;
-                lock.unlock();
 
             }
 
-            lock.unlock();
             updateRespondGui(newResponds);
 
             ThreadMonitor.setLoad(this.subServerThreadID, subServerRequests, this.capacity);
@@ -116,16 +120,16 @@ public class SubServerThread extends Thread {
         }
     }
 
-    private synchronized void updateGui(int newRequests, int newResponds) {
-        tm.setLoad(subServerRequests, newRequests, newResponds);
-    }
-
     private void updateRequestGui(int newRequests) {
         tm.setRequest(subServerRequests, newRequests);
     }
 
     private void updateRespondGui(int newResponds) {
         tm.setRespond(subServerRequests, newResponds);
+    }
+
+    private synchronized void updateGui(int newRequests, int newResponds) {
+        tm.setLoad(subServerRequests, newRequests, newResponds);
     }
 
     public synchronized void killSubServerThread() {
